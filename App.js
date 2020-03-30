@@ -6,109 +6,105 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { Component } from 'react';
+
+import { Dimensions, StatusBar } from 'react-native';
+
+import store from './store/index'; // 导入store
+
+import { NavigationContainer } from '@react-navigation/native';
 import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+  createStackNavigator,
+  CardStyleInterpolators,
+} from '@react-navigation/stack';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
-  );
-};
+import * as RootNavigation from './RootNavigation';
 
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
+const Stack = createStackNavigator();
 
-export default App;
+import Main from './screens/Main/index';
+import Login from './screens/Login';
+import Register from './screens/Register';
+
+export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = store.getState(); // 初始化state,获取redux里面数据
+    store.subscribe(() => {
+      // 订阅state的改变
+      this.setState(store.getState());
+    });
+    console.disableYellowBox = true;
+  }
+
+  render () {
+    return (
+      <NavigationContainer ref={RootNavigation.navigationRef}>
+        {/* <NavigationContainer ref={RootNavigation.navigationRef}> */}
+        <StatusBar
+          translucent={true}
+          backgroundColor="transparent"
+          barStyle="dark-content"
+        />
+        <Stack.Navigator initialRouteName="Main">
+          <Stack.Screen
+            name="Main"
+            component={Main}
+            options={{
+              headerShown: false,
+              // gestureDirection: 'horizontal',
+              cardOverlayEnabled: true,
+              // ...TransitionPresets.FadeFromBottomAndroid, // 从下往上滑入 FadeIn
+              // ...TransitionPresets.ModalPresentationIOS, // 从下往上滑入 顶部空白
+              // ...TransitionPresets.ModalSlideFromBottomIOS, // 从下往上滑入
+              // cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS, // 从底部滑入 顶部空白
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // 从右侧滑入
+              // ...TransitionPresets.ModalSlideFromBottomIOS,
+            }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{
+              headerShown: false,
+              // gestureDirection: 'horizontal',
+              cardOverlayEnabled: true,
+              // ...TransitionPresets.FadeFromBottomAndroid, // 从下往上滑入 FadeIn
+              // ...TransitionPresets.ModalPresentationIOS, // 从下往上滑入 顶部空白
+              // ...TransitionPresets.ModalSlideFromBottomIOS, // 从下往上滑入
+              // cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS, // 从底部滑入 顶部空白
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // 从右侧滑入
+              // ...TransitionPresets.ModalSlideFromBottomIOS,
+            }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              // headerShown: false,
+              headerTransparent: true,
+              headerTitle: '',
+              headerTitleAlign: 'center',
+              headerStyle: {
+                backgroundColor: '#4fc08d',
+              },
+              headerStatusBarHeight: StatusBar.currentHeight,
+              headerTintColor: '#fff',
+              gestureEnabled: false,
+              // gestureDirection: 'horizontal',
+              cardOverlayEnabled: true,
+              // ...TransitionPresets.FadeFromBottomAndroid, // 从下往上滑入 FadeIn
+              // ...TransitionPresets.ModalPresentationIOS, // 从下往上滑入 顶部空白
+              // ...TransitionPresets.ModalSlideFromBottomIOS, // 从下往上滑入
+              // cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS, // 从底部滑入 顶部空白
+              cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // 从右侧滑入
+              // ...TransitionPresets.ModalSlideFromBottomIOS,
+            }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
+  }
+}
